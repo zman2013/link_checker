@@ -11,6 +11,8 @@
  * 随后检索之前保存在 Local Storage 中的 checkbox 数据并更新相应的 checkbox。
  */
 
+console.log('content.js start')
+
 const checkboxes = [];
 
 chrome.storage.local.get("checkboxes", (items) => {
@@ -26,13 +28,18 @@ function addCheckbox(link) {
   // 判断父元素的 class 是否为 "c-title t t tts-title"
   if (link.parentElement.classList.contains('c-title') && link.parentElement.classList.contains('t') && link.parentElement.classList.contains('tts-title')) {
 
+     // 判断前一个兄弟节点是否为 checkbox
+     if (link.previousElementSibling && link.previousElementSibling.nodeName.toLowerCase() === 'input' && link.previousElementSibling.type === 'checkbox') {
+      return;
+    }
+
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.value = link.href;
     checkbox.style = "width:20px;height:20px"
     checkbox.onclick = function () {
       if (checkbox.checked) {
-        checkboxes.push({ href: link.href, text: link.text });
+        checkboxes.push({ href: link.href, text: '"'+link.text+'"' });
       } else {
         const index = checkboxes.findIndex(c => c.href === link.href);
         if (index !== -1) {
@@ -42,10 +49,10 @@ function addCheckbox(link) {
       chrome.storage.local.set({ checkboxes });
     };
 
-    const label = document.createElement("label");
-    label.appendChild(checkbox);
+    // const label = document.createElement("label");
+    // label.appendChild(checkbox);
     // label.appendChild(document.createTextNode(link.text));
-    link.parentNode.insertBefore(label, link);
+    link.parentNode.insertBefore(checkbox, link);
   }
 }
 
@@ -56,12 +63,13 @@ function addCheckboxes() {
   }
 }
 
-addCheckboxes()
+console.log('start addCheckboxes')
+
+setInterval(addCheckboxes, 100)
 
 chrome.storage.local.get("checkboxes", ({ checkboxes }) => {
   if (checkboxes) {
     checkboxes.forEach(({ href }) => {
-      console.log(href)
       const checkbox = document.querySelector(`input[value="${href}"]`);
       if (checkbox) {
         checkbox.checked = true;

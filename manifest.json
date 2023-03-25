@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "百度查询工具",
+  "version": "1.0",
+  "description": "在百度搜索列表项前添加复选框，可以下载勾选的超链接信息到本地文件中",
+  "permissions": [
+    "activeTab",
+    "storage","downloads","tabs"
+  ],
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": [
+        "https://developer.chrome.com/docs/extensions/*",
+        "https://developer.chrome.com/docs/webstore/*",
+        "https://*/*"
+      ]
+    }
+  ],
+
+  "action": {
+    "default_popup": "src/popup.html"
+  }
+  ,
+  "background": {
+    "service_worker": "src/background.js"
+  }
+}
